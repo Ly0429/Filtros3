@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Reducción de Ruido 3</title>
+
+    <style>
+        body {
+            margin: 0;
+            font-family: 'Segoe UI', Tahoma, sans-serif;
+            background: linear-gradient(135deg, #39677a, #203a43, #2c5364);
+            color: #ffffff;
+            text-align: center;
+        }
+
+        .container {
+            margin-top: 80px;
+        }
+
+
+        h2 {
+            margin-bottom: 20px;
+            font-weight: 900;
+            letter-spacing: 2px;
+            font-size: 50px;
+        }
+
+
+        canvas {
+            margin-top: 20px;
+            background: #111;
+            max-width: 90%;
+            border-radius: 200px;
+            box-shadow: 0 0 60px rgba(0, 0, 0, 0.6);
+        }
+
+        input[type="file"] {
+            margin-top: 10px;
+            padding: 5px;
+            border-radius: px;
+            border: none;
+            background: #ffffff;
+            color: #000;
+        }
+
+
+        button {
+            margin: 10px 5px;
+            padding: 12px 18px;
+            border: none;
+            border-radius: 100px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: 0.3s;
+            color: white;
+        }
+
+        /* Colores individuales */
+        #noise {
+            background: #615fdd;
+        }
+
+        #salt {
+            background: #4bc9ce;
+            color: rgb(255, 255, 255);
+        }
+
+        #blur {
+            background: #3dcf97;
+            color: rgb(255, 255, 255);
+        }
+
+        #median {
+            background: #c7307b;
+        }
+
+        #reset {
+            background: #d4d4d4;
+            color: rgb(15, 15, 15);
+        }
+
+        #brightness {
+            background: #ffb347;
+        }
+
+        #contrast {
+            background: #6a5acd;
+        }
+
+        #saturation {
+            background: #ff6f91;
+        }
+
+        /* Hover */
+        button:hover {
+            transform: scale(1.08);
+            opacity: 0.9;
+        }
+
+        /* SLIDERS */
+        input[type="range"] {
+            width: 200px;
+            margin: 10px;
+        }
+
+        h3 {
+            margin-top: 30px;
+            font-size: 28px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container">
+
+        <h2>Reducción de Ruido</h2>
+
+        <input type="file" id="upload">
+        <br>
+
+        <canvas id="canvas"></canvas>
+
+        <br>
+
+        <button id="noise">Ruido Gaussiano</button>
+        <button id="salt">Sal y Pimienta</button>
+        <button id="blur">Blur</button>
+        <button id="median">Mediana</button>
+        <button id="reset">Reset</button>
+
+
+        <h3>Filtros Personalizados</h3>
+
+        <!-- BRILLO -->
+        <div>
+            <label>Brillo</label><br>
+            <input type="range" id="sliderBrightness" min="-100" max="100" value="0">
+        </div>
+
+        <!-- CONTRASTE -->
+        <div>
+            <label>Contraste</label><br>
+            <input type="range" id="sliderContrast" min="0" max="200" value="100">
+        </div>
+
+        <!-- SATURACIÓN -->
+        <div>
+            <label>Saturación</label><br>
+            <input type="range" id="sliderSaturation" min="0" max="200" value="100">
+        </div>
+
+    </div>
+
+    <script src="Filtros3.js"></script>
+
+</body>
+
+</html>

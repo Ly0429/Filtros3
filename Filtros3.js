@@ -8,6 +8,11 @@ const btnBlur = document.getElementById("blur");
 const btnMedian = document.getElementById("median");
 const btnReset = document.getElementById("reset");
 
+// SLIDERS
+const sliderBrightness = document.getElementById("sliderBrightness");
+const sliderContrast = document.getElementById("sliderContrast");
+const sliderSaturation = document.getElementById("sliderSaturation");
+
 let originalImage = null;
 
 upload.addEventListener("change", function (e) {
@@ -19,6 +24,7 @@ upload.addEventListener("change", function (e) {
         canvas.height = img.height;
         ctx.drawImage(img, 0, 0);
         originalImage = ctx.getImageData(0, 0, canvas.width, canvas.height);
+        currentImage = ctx.getImageData(0, 0, canvas.width, canvas.height);
     }
     img.src = URL.createObjectURL(file);
 });
@@ -39,6 +45,7 @@ function addGaussianNoise() {
         data[i + 2] = clamp(data[i + 2] + noise);
     }
     ctx.putImageData(imageData, 0, 0);
+    currentImage = ctx.getImageData(0, 0, canvas.width, canvas.height);
 }
 
 // Filtro sal y pimienta
@@ -55,6 +62,7 @@ function addSaltPepper() {
         }
     }
     ctx.putImageData(imageData, 0, 0);
+    currentImage = ctx.getImageData(0, 0, canvas.width, canvas.height);
 
 }
 
@@ -90,6 +98,7 @@ function blur() {
         }
     }
     ctx.putImageData(imageData, 0, 0);
+    currentImage = ctx.getImageData(0, 0, canvas.width, canvas.height);
 }
 
 
@@ -131,14 +140,114 @@ function medianFilter() {
         }
     }
     ctx.putImageData(imageData, 0, 0);
+    currentImage = ctx.getImageData(0, 0, canvas.width, canvas.height);
 }
 
+//Los filtros 
 
-//Reset
-function resetImage() {
-    if (originalImage) {
-        ctx.putImageData(originalImage, 0, 0);
+function applyBrightness() {
+    let value = parseInt(sliderBrightness.value);
+
+    let imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+    let data = imageData.data;
+
+    for (let i = 0; i < data.length; i += 4) {
+        data[i] = clamp(data[i] + value);
+        data[i + 1] = clamp(data[i + 1] + value);
+        data[i + 2] = clamp(data[i + 2] + value);
     }
+
+    ctx.putImageData(imageData, 0, 0);
+}
+
+function applyContrast() {
+    let value = parseInt(sliderContrast.value);
+    let factor = (259 * (value + 255)) / (255 * (259 - value));
+
+    let imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+    let data = imageData.data;
+
+    for (let i = 0; i < data.length; i += 4) {
+        data[i] = clamp(factor * (data[i] - 128) + 128);
+        data[i + 1] = clamp(factor * (data[i + 1] - 128) + 128);
+        data[i + 2] = clamp(factor * (data[i + 2] - 128) + 128);
+    }
+
+    ctx.putImageData(imageData, 0, 0);
+}
+
+function applySaturation() {
+    let value = sliderSaturation.value / 100;
+
+    let imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+    let data = imageData.data;
+
+    for (let i = 0; i < data.length; i += 4) {
+
+        let r = data[i];
+        let g = data[i + 1];
+        let b = data[i + 2];
+
+        let gray = 0.3 * r + 0.59 * g + 0.11 * b;
+
+        data[i] = clamp(gray + value * (r - gray));
+        data[i + 1] = clamp(gray + value * (g - gray));
+        data[i + 2] = clamp(gray + value * (b - gray));
+    }
+
+    ctx.putImageData(imageData, 0, 0);
+}
+
+let currentImage = null;
+
+function applyAllFilters() {
+
+    if (!currentImage) return;
+
+    let imageData = new ImageData(
+        new Uint8ClampedArray(currentImage.data),
+        currentImage.width,
+        currentImage.height
+    );
+
+    let data = imageData.data;
+
+    let brightness = parseInt(sliderBrightness.value);
+    let contrast = parseInt(sliderContrast.value);
+    let saturation = sliderSaturation.value / 100;
+
+    let factor = (259 * (contrast + 255)) / (255 * (259 - contrast));
+
+    for (let i = 0; i < data.length; i += 4) {
+
+        let r = data[i];
+        let g = data[i + 1];
+        let b = data[i + 2];
+
+
+        // CONTRASTE
+        r = factor * (r - 128) + 128;
+        g = factor * (g - 128) + 128;
+        b = factor * (b - 128) + 128;
+
+        // SATURACIÓN
+        let gray = 0.3 * r + 0.59 * g + 0.11 * b;
+
+        r = gray + saturation * (r - gray);
+        g = gray + saturation * (g - gray);
+        b = gray + saturation * (b - gray);
+
+        // BRILLO
+        r += brightness;
+        g += brightness;
+        b += brightness;
+
+        data[i] = clamp(r);
+        data[i + 1] = clamp(g);
+        data[i + 2] = clamp(b);
+    }
+
+    ctx.putImageData(imageData, 0, 0);
 }
 
 
@@ -147,10 +256,27 @@ btnNoise.onclick = addGaussianNoise;
 btnSalt.onclick = addSaltPepper;
 btnBlur.onclick = blur;
 btnMedian.onclick = medianFilter;
-btnReset.onclick = resetImage;
+
 
 btnReset.onclick = () => {
     if (originalImage) {
         ctx.putImageData(originalImage, 0, 0);
+        currentImage = ctx.getImageData(0, 0, canvas.width, canvas.height);
     }
+
+    sliderBrightness.value = 0;
+    sliderContrast.value = 100;
+    sliderSaturation.value = 100;
+
+    sliderBrightness.addEventListener("input", applyAllFilters);
+    sliderContrast.addEventListener("input", applyAllFilters);
+    sliderSaturation.addEventListener("input", applyAllFilters);
+
+    //Reset
+    function resetImage() {
+        if (originalImage) {
+            ctx.putImageData(originalImage, 0, 0);
+        }
+    }
+
 };
