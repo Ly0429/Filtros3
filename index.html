@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+    <meta charset="UTF-8">
+    <title>Filtros en Frecuencia</title>
+    <style>
+    body {
+        margin: 0;
+        background: #1e1e1e;
+        color: white;
+        font-family: Arial;
+        text-align:center;
+    }
+
+    canvas{
+        margin-top:20px;
+        background: black;
+        max-width: 90%;
+    }
+
+    button{
+        margin-top: 10px;
+        padding: 10px;
+        cursor:pointer;
+    }
+
+</style>
+</head>
+
+<body>
+    <h2>Filtros en Frecuencia</h2>
+    <input type="file" id="upload">
+<br>
+<canvas id ="canvas"></canvas>
+
+<br>
+
+<button id="noise">Ruido Gaussiano</button>
+<button id="salt">Sal y Pimienta</button>
+<button id="blur">blur</button>
+<button id="median">Mediana</button>
+<button id="reset">Reset</button>
+
+<script src="Filtros2.js"></script>
+</body>
+</html>
