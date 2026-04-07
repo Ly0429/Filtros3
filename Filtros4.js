@@ -141,25 +141,25 @@ function medianFilter() {
 function applyFilters() {
     if (!originalImage) return;
 
-    // 🔁 Siempre volver a la original
+    // Siempre volver a la original
     ctx.putImageData(originalImage, 0, 0);
 
-    // 🌫️ Ruido
+    // Ruido
     for (let i = 0; i < noiseRange.value; i++) {
         addGaussianNoise();
     }
 
-    // ⚫⚪ Sal y pimienta
+    // Sal y pimienta
     for (let i = 0; i < saltRange.value; i++) {
         addSaltPepper();
     }
 
-    // 🌫️ Blur
+    // Blur
     for (let i = 0; i < blurRange.value; i++) {
         blur();
     }
 
-    // 🧠 Mediana
+    // Mediana
     for (let i = 0; i < medianRange.value; i++) {
         medianFilter();
     }

@@ -16,6 +16,10 @@ const btnReset = document.getElementById("reset");
 const sliderBrightness = document.getElementById("sliderBrightness");
 const sliderContrast = document.getElementById("sliderContrast");
 const sliderSaturation = document.getElementById("sliderSaturation");
+const sliderNoise = document.getElementById("sliderNoise");
+const sliderSalt = document.getElementById("sliderSalt");
+const sliderBlur = document.getElementById("sliderBlur");
+const sliderMedian = document.getElementById("sliderMedian");
 
 let originalImage = null;
 
@@ -258,7 +262,7 @@ function brightnessFilter() {
 
     let value = parseInt(sliderBrightness.value);
 
- 
+    // 
     if (value === 0) value = 30;
 
     let imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
@@ -321,6 +325,75 @@ function saturationFilter() {
     currentImage = ctx.getImageData(0, 0, canvas.width, canvas.height);
 }
 
+function gaussianNoiseSlider() {
+    if (!currentImage) return;
+
+   
+    ctx.putImageData(currentImage, 0, 0);
+
+    let intensity = sliderNoise.value;
+
+    let imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+    let data = imageData.data;
+
+    for (let i = 0; i < data.length; i += 4) {
+        let noise = (Math.random() - 0.5) * intensity;
+
+        data[i] = clamp(data[i] + noise);
+        data[i + 1] = clamp(data[i + 1] + noise);
+        data[i + 2] = clamp(data[i + 2] + noise);
+    }
+
+    ctx.putImageData(imageData, 0, 0);
+}
+
+function saltPepperSlider() {
+    if (!currentImage) return;
+
+    ctx.putImageData(currentImage, 0, 0);
+
+    let intensity = sliderSalt.value / 100;
+
+    let imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+    let data = imageData.data;
+
+    for (let i = 0; i < data.length; i += 4) {
+
+        if (Math.random() < intensity) {
+            let val = Math.random() < 0.5 ? 0 : 255;
+            data[i] = data[i + 1] = data[i + 2] = val;
+        }
+    }
+
+    ctx.putImageData(imageData, 0, 0);
+}
+
+function blurSlider() {
+    if (!originalImage) return;
+
+    
+    ctx.putImageData(originalImage, 0, 0);
+
+    let times = parseInt(sliderBlur.value);
+
+    for (let t = 0; t < times; t++) {
+        blur();
+    }
+}
+
+function medianSlider() {
+    if (!originalImage) return;
+
+    
+    ctx.putImageData(originalImage, 0, 0);
+
+    let times = parseInt(sliderMedian.value);
+
+    for (let t = 0; t < times; t++) {
+        medianFilter();
+    }
+}
+
 
 btnNoise.onclick = addGaussianNoise;
 btnSalt.onclick = addSaltPepper;
@@ -332,7 +405,10 @@ btnContrast.onclick = contrastFilter;
 btnSaturation.onclick = saturationFilter;
 
 
-
+sliderNoise.oninput = gaussianNoiseSlider;
+sliderSalt.oninput = saltPepperSlider;
+sliderBlur.oninput = blurSlider;
+sliderMedian.oninput = medianSlider;
 
 btnReset.onclick = () => {
     if (originalImage) {
